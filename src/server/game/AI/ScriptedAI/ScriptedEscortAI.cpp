@@ -32,7 +32,8 @@ npc_escortAI::npc_escortAI(Creature* creature) : ScriptedAI(creature),
     m_bCanReturnToStart(false),
     DespawnAtEnd(true),
     DespawnAtFar(true),
-    ScriptWP(false)
+    ScriptWP(false),
+	HasImmuneToNPCFlags(false)
 {}
 
 void npc_escortAI::AttackStart(Unit* who)
@@ -179,6 +180,12 @@ void npc_escortAI::EnterEvadeMode()
     else
     {
         me->GetMotionMaster()->MoveTargetedHome();
+		if (HasImmuneToNPCFlags)
+		    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
+		    {
+		        HasImmuneToNPCFlags = true;
+				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+			}
         Reset();
     }
 }
