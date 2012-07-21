@@ -23283,6 +23283,12 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
             continue;
         }
 
+		 if (aura->GetId() == 46924)
+         {
+             ++itr;
+             continue;
+         }
+		
         // no alt item, remove aura, restart check
         RemoveOwnedAura(itr);
     }
