@@ -2146,7 +2146,7 @@ if ((!target->IsFriendlyTo(m_caster)) && !(m_spellInfo->AttributesEx3 & SPELL_AT
             targetInfo.missCondition = SPELL_MISS_NONE;
     }
     else
-        targetInfo.missCondition = SPELL_MISS_EVADE; //SPELL_MISS_NONE;
+        targetInfo.missCondition = SPELL_MISS_EVADE;
 
     // Spell have speed - need calculate incoming time
     // Incoming time is zero for self casts. At least I think so.
@@ -2345,7 +2345,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     // Reset damage/healing counter
     m_damage = target->damage;
     m_healing = -target->damage;
-
+    m_resist = 0;
+	
     // Fill base trigger info
     uint32 procAttacker = m_procAttacker;
     uint32 procVictim   = m_procVictim;
@@ -2371,11 +2372,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     if (spellHitTarget)
     {
-        SpellMissInfo missInfo2 = DoSpellHitOnUnit(spellHitTarget, mask, target->scaleAura);
-        if (missInfo2 != SPELL_MISS_NONE)
+        SpellMissInfo tmp = DoSpellHitOnUnit(spellHitTarget, mask, target->scaleAura);
+		if (tmp != SPELL_MISS_NONE)
         {
-            if (missInfo2 != SPELL_MISS_MISS)
-                m_caster->SendSpellMiss(unit, m_spellInfo->Id, missInfo2);
+            if (tmp != SPELL_MISS_MISS)
+			     m_caster->SendSpellMiss(unit, m_spellInfo->Id, tmp);
             m_damage = 0;
             spellHitTarget = NULL;
         }
@@ -2468,7 +2469,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, m_spellSchoolMask);
 
         // Add bonuses and fill damageInfo struct
-        caster->CalculateSpellDamageTaken(&damageInfo, m_damage, m_spellInfo, m_attackType,  target->crit);
+        caster->CalculateSpellDamageTaken(&damageInfo, m_damage, m_spellInfo, m_attackType, target->crit, m_resist);
         caster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
 
         // Send log damage message to client
@@ -2611,6 +2612,11 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             //TODO: This is a hack. But we do not know what types of stealth should be interrupted by CC
             if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer())
                 unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+				
+			bool binary = uint32(m_spellInfo->AttributesCu & SPELL_ATTR0_CU_BINARY);
+			m_resist = m_caster->CalcSpellResistance(unit, m_spellSchoolMask , binary, m_spellInfo);
+			if (m_resist >= 100)
+			    return SPELL_MISS_RESIST;
         }
         else if (m_caster->IsFriendlyTo(unit))
         {
@@ -2633,7 +2639,14 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             }
         }
     }
-
+    else if (!m_spellInfo->IsPositive())
+	{
+	    bool binary = uint32(m_spellInfo->AttributesCu & SPELL_ATTR0_CU_BINARY);
+		m_resist = m_caster->CalcSpellResistance(unit, m_spellSchoolMask , binary, m_spellInfo);
+		if (m_resist >= 100)
+		    return SPELL_MISS_RESIST;
+	}
+	
     // Get Data Needed for Diminishing Returns, some effects may have multiple auras, so this must be done on spell hit, not aura add
     m_diminishGroup = GetDiminishingReturnsGroupForSpell(m_spellInfo, m_triggeredByAuraSpell);
     if (m_diminishGroup)
