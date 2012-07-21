@@ -5,11 +5,11 @@ By Rochet2
 Now with DB implemented
 
 ScriptName for NPC:
-NPC_Transmogrify
+npc_transmogrify
 
 ScriptLoader.cpp:
-void AddSC_NPC_Transmogrify();
-AddSC_NPC_Transmogrify();
+void AddSC_npc_transmogrify();
+AddSC_npc_transmogrify();
 
 TODO:
 Make DB saving even better (Deleting)? What about coding?
@@ -32,10 +32,10 @@ Item link icon to Are You sure text
 
 #include "ScriptPCH.h"
 
-class NPC_Transmogrify : public CreatureScript
+class npc_transmogrify : public CreatureScript
 {
 public:
-	NPC_Transmogrify() : CreatureScript("NPC_Transmogrify") { }
+	npc_transmogrify() : CreatureScript("npc_transmogrify") { }
 
 	bool OnGossipHello(Player* pPlayer, Creature* pUnit)
 	{
@@ -269,7 +269,7 @@ private:
 	}
 };
 
-void AddSC_NPC_Transmogrify()
+void AddSC_npc_transmogrify()
 {
-	new NPC_Transmogrify();
+	new npc_transmogrify();
 }

@@ -38,7 +38,7 @@ void AddSC_dalaran_squirrel();
 // Arena Spectator
 void AddSC_arena_spectator_script();
 // Transmogrify
-void AddSC_NPC_Transmogrify();
+void AddSC_npc_transmogrify();
 void AddSC_npc_customize();
 void AddSC_skill_npc();
 void AddSC_npc_enchantment();
@@ -1285,7 +1285,7 @@ void AddCustomScripts()
     AddSC_ArgentTournament();
     AddSC_dalaran_squirrel();
     AddSC_arena_spectator_script();
-    AddSC_NPC_Transmogrify();
+    AddSC_npc_transmogrify();
 	AddSC_npc_enchantment();
 	AddSC_Title_NPC();
 	AddSC_npc_tele_trigger();
