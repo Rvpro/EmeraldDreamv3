@@ -243,6 +243,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     SetReactState(ReactStates(fields[6].GetUInt8()));
     SetCanModifyStats(true);
+	SynchronizeLevelWithOwner();
 
     if (getPetType() == SUMMON_PET && !current)              //all (?) summon pets come with full health when called, but not when they are current
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
