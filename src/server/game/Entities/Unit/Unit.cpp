@@ -1626,7 +1626,9 @@ uint32 Unit::CalcArmorReducedDamage(Unit* victim, const uint32 damage, SpellInfo
 
 uint32 Unit::GetSpellPenetration(SpellSchoolMask schoolMask) const
 {
-    const Unit * source = ToPlayer();
+    int32 spellPenetration = 0;
+	
+	const Unit * source = ToPlayer();
 
     // Magic damage, check for resists
     if (!source)
@@ -2642,7 +2644,7 @@ uint32 Unit::CalcMagicSpellHitChance(Unit* victim, SpellSchoolMask schoolMask, S
        bool bNegativeAura = true;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (spell->Effects[i].ApplyAuraName == 0)
+            if (spellInfo->Effects[i].ApplyAuraName == 0)
             {
                 bNegativeAura = false;
                 break;
@@ -2653,7 +2655,7 @@ uint32 Unit::CalcMagicSpellHitChance(Unit* victim, SpellSchoolMask schoolMask, S
         bool bDirectDamage = false;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (spell->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE || spell->Effects[i].Effect == SPELL_EFFECT_HEALTH_LEECH)
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SCHOOL_DAMAGE || spellInfo->Effects[i].Effect == SPELL_EFFECT_HEALTH_LEECH)
             {
                 bDirectDamage = true;
                 break;
