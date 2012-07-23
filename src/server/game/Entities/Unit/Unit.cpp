@@ -1743,7 +1743,16 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
         if (calc_resist >= 0)
             dmgInfo.ResistDamage(damage * calc_resist / 100);
         else
-            dmgInfo.ResistDamage(damage * CalcSpellResistance(victim, schoolMask, binary, spellInfo) / 100);
+            
+			// Chaos Bolt should not be resisted
+            if (spellInfo && spellInfo->SpellIconID == 3178)
+                binary = 0;
+				
+	        // speed buff should not be resisted
+            if (spellInfo && spellInfo->SpellIconID == 3687)
+                binary = 0;
+
+			dmgInfo.ResistDamage(damage * CalcSpellResistance(victim, schoolMask, binary, spellInfo) / 100);
 
     // Ignore Absorption Auras
     float auraAbsorbMod = 0;
