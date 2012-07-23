@@ -2644,29 +2644,37 @@ void Spell::EffectDualWield(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectPull(SpellEffIndex effIndex)
 {
-    // TODO: create a proper pull towards distract spell center for distract
+      // TODO: create a proper pull towards distract spell center for distract
     EffectNULL(effIndex);
 }
 
 void Spell::EffectDistract(SpellEffIndex /*effIndex*/)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
-        return;
 
-    // Check for possible target
+       // Check for possible target
     if (!unitTarget || unitTarget->isInCombat())
         return;
 
     // target must be OK to do this
-    if (unitTarget->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING))
+    if (unitTarget->HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_STUNNED | UNIT_STAT_FLEEING))
         return;
 
-    unitTarget->SetFacingTo(unitTarget->GetAngle(destTarget));
-    unitTarget->ClearUnitState(UNIT_STATE_MOVING);
+    float angle = unitTarget->GetAngle(m_targets.GetDst());
 
-    if (unitTarget->GetTypeId() == TYPEID_UNIT)
+    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    {
+        // For players just turn them
+        unitTarget->ToPlayer()->SetPosition(unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), angle, false);
+        unitTarget->ToPlayer()->SendTeleportAckPacket();
+    }
+    else
+    {
+        // Set creature Distracted, Stop it, And turn it
+        unitTarget->SetOrientation(angle);
+        unitTarget->StopMoving();
         unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
-		unitTarget->SendMovementFlagUpdate();
+        unitTarget->SendMovementFlagUpdate();
+    }
 }
 
 void Spell::EffectPickPocket(SpellEffIndex /*effIndex*/)
